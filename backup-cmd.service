@@ -1,0 +1,12 @@
+[Unit]
+Description=Backup CMD
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/util/backup_cmd
+ExecStart=/opt/util/backup_cmd/backup_cmd
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
