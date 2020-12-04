@@ -1,0 +1,51 @@
+#!/bin/bash
+
+source backup_params.sh
+
+archive_extension=".tar.gz"
+sleep_time=30
+
+justBackuped=false
+
+echo "Starting backup daemon..."
+
+while true; do
+# Keep Daemon Running
+	current_time=$(date +"%H%M")
+	if [[ "$current_time" = "$backup_time" ]]; then
+		# Time to backup!
+		if [ "$justBackuped" = true ]; then
+			continue
+		fi
+
+		for i in "${source_dirs[@]}"
+		do
+			echo "Backing up $i..."
+			archive_name=$(basename $i)
+			epoch=$(date +%s)
+			archive_file=$archive_name-$epoch$archive_extension
+
+			# Create tarball
+			tar -cf $archive_file -C $i .
+			for j in "${output_dirs[@]}"
+			do
+				# Copy to destination
+				echo "Writing to $j..."
+				cp $archive_file $j/
+
+				# Remove Old Files
+				echo "Checking and removing archives older than $old_time days"
+				find $j/$archive_name* -mtime +$old_time -exec rm {} \;
+			done
+
+			echo "Removing temporary archive..."
+			rm -rf $archive_file
+
+			echo "Backup complete"
+			justBackuped=true
+		done
+
+		justBackuped=false
+	fi
+	sleep $sleep_time
+done
