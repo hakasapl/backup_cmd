@@ -23,7 +23,7 @@ do
 
                 # Remove Old Files
                 echo "Checking and removing archives older than $old_time days"
-                find $j/$archive_name* -mtime +$old_time -exec rm {} \;
+                find $j/$archive_name* -mtime +$old_time -exec rm -rf {} \;
         done
 
         echo "Removing temporary archive..."
